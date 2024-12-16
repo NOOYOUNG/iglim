@@ -322,10 +322,10 @@ void CSWProject1Dlg::DetectCircle(Mat matImage)
 	}
 	
 	Mat grayImage;
-	cvtColor(matImage, grayImage, COLOR_BGR2GRAY); // 허프 원 검출을 위해 그레이스케일 이미지로 변환
+	cvtColor(matImage, grayImage, COLOR_BGR2GRAY);
 
 	Mat blurredImage;
-	GaussianBlur(grayImage, blurredImage, Size(9, 9), 2, 2); // 노이즈를 줄이기 위한 가우시안 블러
+	GaussianBlur(grayImage, blurredImage, Size(9, 9), 2, 2);
 
 	vector<Vec3f> circles;
 	HoughCircles(blurredImage, circles, HOUGH_GRADIENT, 1, 50, 100, 20, 10, 100);
