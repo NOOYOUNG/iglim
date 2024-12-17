@@ -513,7 +513,7 @@ void CSWProject1Dlg::SaveImageToFolder(const Mat& matImage, const CString& fileN
 	CString defaultName;
 	defaultName.Format(_T("%s%d"), fileName, cnt);
 
-	CString path = _T("C:\\User\\\user\\Desktop\\iglim\\SWProject_1\\image\\");
+	CString path = _T("C:\\Users\\\user\\Desktop\\iglim\\SWProject_1\\image\\");
 	CString fullPath = path + defaultName + _T(".jpg");
 	string strPath = CW2A(fullPath.GetString());
 
