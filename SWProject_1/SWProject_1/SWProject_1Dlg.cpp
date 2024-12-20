@@ -375,11 +375,11 @@ void CSWProject1Dlg::DetectCircle(Mat matImage)
 
 		CString centerStr;
 		centerStr.Format(_T("Center (%d, %d)"), center.x, center.y);
-		putText(dst, string(CT2CA(centerStr)), Point(center.x - radius, center.y - radius - 25), 1, 1, Scalar(0, 0, 255));
+		putText(dst, string(CT2CA(centerStr)), Point(center.x - radius, center.y + radius + 25), 1, 1, Scalar(0, 0, 255));
 
 		CString radiusStr;
 		radiusStr.Format(_T("Radius = %d"), radius);
-		putText(dst, string(CT2CA(radiusStr)), Point(center.x - radius, center.y - radius - 10), 1, 1, Scalar(0, 0, 255));
+		putText(dst, string(CT2CA(radiusStr)), Point(center.x - radius, center.y + radius + 10), 1, 1, Scalar(0, 0, 255));
 
 		circle(dst, center, 1, Scalar(0, 0, 255), -1, LINE_AA);
 	}
@@ -572,51 +572,51 @@ void CSWProject1Dlg::SaveCurrentFrame(CDC& dc, int width, int height)
 }
 
 
-void CSWProject1Dlg::GetMatImage(CDC& dc, Mat& saveImg, int width, int height)
-{
-	HDC hdc = CreateCompatibleDC(dc);
-	HBITMAP hbm = CreateCompatibleBitmap(dc, width, height);
-	SelectObject(hdc, hbm);
-
-	BitBlt(hdc, 0, 0, width, height, dc, 0, 0, SRCCOPY);
-
-	BITMAPINFOHEADER bmiHeader = { 0 };
-	bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-	bmiHeader.biWidth = width;
-	bmiHeader.biHeight = -height;
-	bmiHeader.biPlanes = 1;
-	bmiHeader.biBitCount = 24;
-	bmiHeader.biCompression = BI_RGB;
-
-	int rowSize = (width * 3 + 3) / 4 * 4;
-	vector<BYTE> buffer(rowSize * height);
-
-	GetDIBits(hdc, hbm, 0, height, buffer.data(), (BITMAPINFO*)&bmiHeader, DIB_RGB_COLORS);
-
-	for (int y = 0; y < height; y++) {
-		for (int x = 0; x < width; x++) {
-			int bufferIdx = y * rowSize + x * 3;
-			saveImg.at<Vec3b>(y, x) = Vec3b(buffer[bufferIdx], buffer[bufferIdx + 1], buffer[bufferIdx + 2]);
-		}
-	}
-
-	//imshow("Capture", saveImg);
-
-	DeleteObject(hbm);
-	DeleteDC(hdc);
-}
-
-void CSWProject1Dlg::SaveImageToFolder(const Mat& matImage, const CString& fileName)
-{
-	CString defaultName;
-	defaultName.Format(_T("%s%d"), fileName, cnt);
-
-	CString path = _T("C:\\Users\\\user\\Desktop\\iglim\\SWProject_1\\image\\");
-	CString fullPath = path + defaultName + _T(".jpg");
-	string strPath = CW2A(fullPath.GetString());
-
-	imwrite(strPath, matImage);
-	cnt++;
-}
+//void CSWProject1Dlg::GetMatImage(CDC& dc, Mat& saveImg, int width, int height)
+//{
+//	HDC hdc = CreateCompatibleDC(dc);
+//	HBITMAP hbm = CreateCompatibleBitmap(dc, width, height);
+//	SelectObject(hdc, hbm);
+//
+//	BitBlt(hdc, 0, 0, width, height, dc, 0, 0, SRCCOPY);
+//
+//	BITMAPINFOHEADER bmiHeader = { 0 };
+//	bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+//	bmiHeader.biWidth = width;
+//	bmiHeader.biHeight = -height;
+//	bmiHeader.biPlanes = 1;
+//	bmiHeader.biBitCount = 24;
+//	bmiHeader.biCompression = BI_RGB;
+//
+//	int rowSize = (width * 3 + 3) / 4 * 4;
+//	vector<BYTE> buffer(rowSize * height);
+//
+//	GetDIBits(hdc, hbm, 0, height, buffer.data(), (BITMAPINFO*)&bmiHeader, DIB_RGB_COLORS);
+//
+//	for (int y = 0; y < height; y++) {
+//		for (int x = 0; x < width; x++) {
+//			int bufferIdx = y * rowSize + x * 3;
+//			saveImg.at<Vec3b>(y, x) = Vec3b(buffer[bufferIdx], buffer[bufferIdx + 1], buffer[bufferIdx + 2]);
+//		}
+//	}
+//
+//	//imshow("Capture", saveImg);
+//
+//	DeleteObject(hbm);
+//	DeleteDC(hdc);
+//}
+//
+//void CSWProject1Dlg::SaveImageToFolder(const Mat& matImage, const CString& fileName)
+//{
+//	CString defaultName;
+//	defaultName.Format(_T("%s%d"), fileName, cnt);
+//
+//	CString path = _T("C:\\Users\\\user\\Desktop\\iglim\\SWProject_1\\image\\");
+//	CString fullPath = path + defaultName + _T(".jpg");
+//	string strPath = CW2A(fullPath.GetString());
+//
+//	imwrite(strPath, matImage);
+//	cnt++;
+//}
 
 

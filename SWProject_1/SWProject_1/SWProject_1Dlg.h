@@ -54,8 +54,8 @@ public:
 	int y2;
 
 	int cnt = 1;
-	void GetMatImage(CDC& dc, Mat& saveImg, int width, int height);
-	void SaveImageToFolder(const Mat& matImage, const CString& fileName);
+	//void GetMatImage(CDC& dc, Mat& saveImg, int width, int height);
+	//void SaveImageToFolder(const Mat& matImage, const CString& fileName);
 
 	Mat CImageToMat(CImage& cimage);
 	void DetectCircle(Mat matImage);
