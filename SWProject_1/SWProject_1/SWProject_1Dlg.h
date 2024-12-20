@@ -5,7 +5,7 @@
 #pragma once
 
 #include <iostream>
-#include <string>
+#include <string.h>
 #include <vector>
 #include <math.h>
 #include <opencv2/opencv.hpp>
@@ -67,4 +67,7 @@ public:
 	CImage cimage;
 	void CreateBitmapInfo(int imageWidth, int imageHeight);
 	void DrawImage(Mat matImage, BITMAPINFO* requestBmpInfo);
+
+	CImage picImage;
+	void SaveCurrentFrame(CDC& dc, int width, int height);
 };

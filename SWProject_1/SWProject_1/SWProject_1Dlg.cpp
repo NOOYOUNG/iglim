@@ -20,15 +20,15 @@ class CAboutDlg : public CDialogEx
 public:
 	CAboutDlg();
 
-// 대화 상자 데이터입니다.
+	// 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_ABOUTBOX };
 #endif
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
 
-// 구현입니다.
+	// 구현입니다.
 protected:
 	DECLARE_MESSAGE_MAP()
 };
@@ -178,6 +178,42 @@ void CSWProject1Dlg::OnBnClickedButton1()
 	int pos = str.Find(_T(','));
 
 	if (pos != -1) {
+		if (!picImage.IsNull()) {
+			picImage.Destroy();
+		}
+
+		int nWidth = 640;
+		int nHeight = 480;
+		int nBPP = 8;
+
+		CString strX1 = str.Left(pos);
+		CString strY1 = str.Mid(pos + 1);
+		int x1 = _ttoi(strX1);
+		int y1 = _ttoi(strY1);
+
+		picImage.Create(nWidth, nHeight, nBPP);
+
+		CClientDC dc(this);
+		picImage.Draw(dc, 0, 0);
+		CRect rect(0, 0, nWidth, nHeight);
+		dc.FillSolidRect(&rect, RGB(255, 255, 255));
+
+		CPen myPen(PS_SOLID, 1, RGB(0, 0, 0));
+		CBrush myBrush(RGB(0, 0, 0));
+		dc.SelectObject(&myPen);
+		dc.SelectObject(&myBrush);
+
+		int radius = rand() % 21 + 10; // 랜덤한 반지름의 길이는 10 ~ 30 사이로 생성
+
+		if (x1 - radius < 0 || y1 - radius < 0) {
+			AfxMessageBox(_T("Picture Control 범위를 초과하였습니다.\n최소 30,30 이상의 좌표를 다시 입력하세요."));
+		}
+		else {
+			dc.Ellipse(x1 - radius, y1 - radius, x1 + radius, y1 + radius);
+		}
+
+
+		/*
 		CString strX1 = str.Left(pos);
 		CString strY1 = str.Mid(pos+1);
 
@@ -201,7 +237,7 @@ void CSWProject1Dlg::OnBnClickedButton1()
 		}
 		else {
 			dc.Ellipse(x1 - radius, y1 - radius, x1 + radius, y1 + radius);
-		}
+		}*/
 	}
 	else {
 		AfxMessageBox(_T("시작좌표를 입력하세요."));
@@ -222,22 +258,18 @@ void CSWProject1Dlg::OnBnClickedButton2()
 	int pos2 = str2.Find(_T(','));
 
 	if (pos1 != -1 && pos2 != -1) {
-
 		CString strX1 = str1.Left(pos1);
 		CString strY1 = str1.Mid(pos1 + 1);
-
 		x1 = _ttoi(strX1);
 		y1 = _ttoi(strY1);
 
 		CString strX2 = str2.Left(pos2);
 		CString strY2 = str2.Mid(pos2 + 1);
-
 		x2 = _ttoi(strX2);
 		y2 = _ttoi(strY2);
 
 		SetTimer(0, 100, NULL);
 	}
-
 }
 
 
@@ -302,7 +334,7 @@ Mat CSWProject1Dlg::CImageToMat(CImage& cimage)
 		cvtColor(mat, mat, COLOR_RGB2BGR);
 	}
 	else if (bpp == 8) {
-		mat= Mat(height, width, CV_8UC1).clone();
+		mat = Mat(height, width, CV_8UC1).clone();
 		for (int i = 0; i < height; i++) {
 			memcpy(mat.ptr(i), pPixels + i * pitch, width);
 		}
@@ -320,7 +352,7 @@ void CSWProject1Dlg::DetectCircle(Mat matImage)
 		AfxMessageBox(_T("이미지가 비어 있습니다."));
 		return;
 	}
-	
+
 	Mat grayImage;
 	cvtColor(matImage, grayImage, COLOR_BGR2GRAY);
 
@@ -329,22 +361,22 @@ void CSWProject1Dlg::DetectCircle(Mat matImage)
 
 	vector<Vec3f> circles;
 	HoughCircles(blurredImage, circles, HOUGH_GRADIENT, 1, 50, 100, 20, 10, 100);
-	
+
 	if (circles.empty()) {
 		AfxMessageBox(_T("원 검출에 실패했습니다."));
 		return;
 	}
 
-	Mat dst=matImage.clone();
+	Mat dst = matImage.clone();
 
 	for (Vec3f c : circles) {
 		Point center(cvRound(c[0]), cvRound(c[1]));
 		int radius = cvRound(c[2]);
-	
+
 		CString centerStr;
 		centerStr.Format(_T("Center (%d, %d)"), center.x, center.y);
 		putText(dst, string(CT2CA(centerStr)), Point(center.x - radius, center.y - radius - 25), 1, 1, Scalar(0, 0, 255));
-		
+
 		CString radiusStr;
 		radiusStr.Format(_T("Radius = %d"), radius);
 		putText(dst, string(CT2CA(radiusStr)), Point(center.x - radius, center.y - radius - 10), 1, 1, Scalar(0, 0, 255));
@@ -354,7 +386,7 @@ void CSWProject1Dlg::DetectCircle(Mat matImage)
 
 	//imshow("dst", dst);
 
-	m_matImage=dst.clone();
+	m_matImage = dst.clone();
 }
 
 void CSWProject1Dlg::CreateBitmapInfo(int imageWidth, int imageHeight)
@@ -362,7 +394,7 @@ void CSWProject1Dlg::CreateBitmapInfo(int imageWidth, int imageHeight)
 	m_pBitmapInfo = new BITMAPINFO;
 
 	int bpp = 8 * m_matImage.elemSize();
-	
+
 	if (bpp < 32) {
 		padding = 4 - (m_matImage.cols % 4);
 	}
@@ -374,7 +406,7 @@ void CSWProject1Dlg::CreateBitmapInfo(int imageWidth, int imageHeight)
 	if (bpp < 32) {
 		border = 4 - (m_matImage.cols % 4);
 	}
-		
+
 	if (border > 0 || m_matImage.isContinuous() == false) {
 		copyMakeBorder(m_matImage, mat_temp, 0, 0, 0, border, BORDER_CONSTANT, 0);
 	}
@@ -388,7 +420,7 @@ void CSWProject1Dlg::CreateBitmapInfo(int imageWidth, int imageHeight)
 	m_pBitmapInfo->bmiHeader.biPlanes = 1;
 	m_pBitmapInfo->bmiHeader.biBitCount = bpp;
 	m_pBitmapInfo->bmiHeader.biCompression = BI_RGB;
-	
+
 	int rowSize = (imageWidth * 3 + 3) / 4 * 4;
 	vector<BYTE> buffer(rowSize * imageHeight);
 
@@ -415,11 +447,11 @@ void CSWProject1Dlg::DrawImage(Mat matImage, BITMAPINFO* requestBmpInfo)
 	cimage.Create(winSize.width, winSize.height, 24);
 
 	SetDIBitsToDevice(cimage.GetDC(),
-					  0, 0, winSize.width, winSize.height,
-					  (int)(m_matImage.cols / 2 - winSize.width / 2),
-					  (int)(m_matImage.rows / 2 - winSize.height / 2),
-					  0, mat_temp.rows, mat_temp.data,
-					  m_pBitmapInfo, DIB_RGB_COLORS);
+		0, 0, winSize.width, winSize.height,
+		(int)(m_matImage.cols / 2 - winSize.width / 2),
+		(int)(m_matImage.rows / 2 - winSize.height / 2),
+		0, mat_temp.rows, mat_temp.data,
+		m_pBitmapInfo, DIB_RGB_COLORS);
 
 	HDC hdc = ::GetDC(m_image.m_hWnd);
 	cimage.BitBlt(hdc, 0, 0);
@@ -434,9 +466,46 @@ void CSWProject1Dlg::DrawImage(Mat matImage, BITMAPINFO* requestBmpInfo)
 void CSWProject1Dlg::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
-
 	if (nIDEvent == 0) {
-		CClientDC dc(GetDlgItem(IDC_PICTURE));
+		if (!picImage.IsNull()) {
+			picImage.Destroy();
+		}
+
+		int nWidth = 640;
+		int nHeight = 480;
+		int nBPP = 8;
+
+		picImage.Create(nWidth, nHeight, nBPP);
+
+		CClientDC dc(this);
+		picImage.Draw(dc, 0, 0);
+		CRect rect(0, 0, nWidth, nHeight);
+		dc.FillSolidRect(&rect, RGB(255, 255, 255));
+
+		CPen myPen(PS_SOLID, 1, RGB(0, 0, 0));
+		CBrush myBrush(RGB(0, 0, 0));
+		dc.SelectObject(&myPen);
+		dc.SelectObject(&myBrush);
+
+		// 원 이동 및 그리기
+		int radius = 30;
+		if (x1 != x2) {
+			x1 += 1;
+		}
+		if (y1 != y2) {
+			y1 += 1;
+		}
+		dc.Ellipse(x1 - radius, y1 - radius, x1 + radius, y1 + radius);
+
+		// 이미지 저장
+		SaveCurrentFrame(dc, rect.Width(), rect.Height());
+
+		// 원이 목표 위치에 도달하면 타이머 종료
+		if (x1 == x2 && y1 == y2) {
+			KillTimer(0);
+		}
+
+		/*CClientDC dc(GetDlgItem(IDC_PICTURE));
 		CRect rect;
 		GetDlgItem(IDC_PICTURE)->GetClientRect(&rect);
 		dc.FillSolidRect(&rect, RGB(255, 255, 255));
@@ -467,12 +536,41 @@ void CSWProject1Dlg::OnTimer(UINT_PTR nIDEvent)
 
 		if (x1 == x2 && y1 == y2) {
 			KillTimer(0);
-		}
-
+		}*/
 	}
-
 	CDialogEx::OnTimer(nIDEvent);
 }
+
+void CSWProject1Dlg::SaveCurrentFrame(CDC& dc, int width, int height)
+{
+	CImage picImage;
+	picImage.Create(width, height, 32);
+
+	CDC memDC;
+	memDC.CreateCompatibleDC(&dc);
+	CBitmap bitmap;
+	bitmap.CreateCompatibleBitmap(&dc, width, height);
+	CBitmap* pOldBitmap = memDC.SelectObject(&bitmap);
+
+	BitBlt(memDC.m_hDC, 0, 0, width, height, dc.m_hDC, 0, 0, SRCCOPY);
+
+	BitBlt(picImage.GetDC(), 0, 0, width, height, memDC, 0, 0, SRCCOPY);
+
+	picImage.ReleaseDC();
+	memDC.SelectObject(pOldBitmap);
+	bitmap.DeleteObject();
+	memDC.DeleteDC();
+
+	CString defaultName;
+	defaultName.Format(_T("%s%d"), _T("Action"), cnt);
+
+	CString path = _T("C:\\Users\\user\\Desktop\\iglim\\SWProject_1\\image\\");
+	CString fullPath = path + defaultName + _T(".jpg");
+
+	picImage.Save(fullPath);
+	cnt++;
+}
+
 
 void CSWProject1Dlg::GetMatImage(CDC& dc, Mat& saveImg, int width, int height)
 {
@@ -520,3 +618,5 @@ void CSWProject1Dlg::SaveImageToFolder(const Mat& matImage, const CString& fileN
 	imwrite(strPath, matImage);
 	cnt++;
 }
+
+
