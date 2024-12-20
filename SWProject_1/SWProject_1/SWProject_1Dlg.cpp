@@ -114,6 +114,11 @@ BOOL CSWProject1Dlg::OnInitDialog()
 
 	srand((unsigned)time(NULL));
 
+	CWnd* pPicCtrl = GetDlgItem(IDC_PICTURE); // 픽처 컨트롤의 ID로 변경
+	if (pPicCtrl) {
+		pPicCtrl->ModifyStyle(WS_BORDER | SS_BLACKFRAME | SS_SUNKEN, 0, SWP_FRAMECHANGED);
+	}
+
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
 
@@ -280,11 +285,13 @@ void CSWProject1Dlg::OnBnClickedButton3()
 	CFileDialog fileDlg(TRUE, NULL, NULL, OFN_READONLY, _T("image file(*.jpg;*.bmp;*.png;)|*.jpg;*.bmp;*.png;|All Files(*.*)|*.*||"));
 
 	if (fileDlg.DoModal()) {
+		if (!picImage.IsNull()) {
+			picImage.Destroy();
+		}
 
 		CString path = fileDlg.GetPathName();
 
-		CImage image;
-		HRESULT hr = image.Load(path);
+		HRESULT hr = picImage.Load(path);
 		if (FAILED(hr)) {
 			AfxMessageBox(_T("파일을 불러오는데 실패했습니다."));
 			return;
@@ -294,9 +301,9 @@ void CSWProject1Dlg::OnBnClickedButton3()
 		CClientDC dc(GetDlgItem(IDC_PICTURE));
 		GetDlgItem(IDC_PICTURE)->GetClientRect(&rect);
 
-		image.Draw(dc.m_hDC, rect);
+		picImage.Draw(dc.m_hDC, rect);
 
-		m_matImage = CImageToMat(image);
+		m_matImage = CImageToMat(picImage);
 
 		DetectCircle(m_matImage);
 		CreateBitmapInfo(m_matImage.cols, m_matImage.rows);
